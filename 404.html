@@ -5,22 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Page not found · CEED Mock Test</title>
 <style>
-  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; background: #f3f5f9; color: #1b2230; display: grid; place-items: center; min-height: 100vh; text-align: center; padding: 16px; box-sizing: border-box; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; background: #f3f5f9; color: #1b2230; min-height: 100vh; display: flex; flex-direction: column; }
+  .nf { flex: 1; display: grid; place-items: center; text-align: center; padding: 16px; }
   h1 { font-size: 26px; margin: 0 0 8px; }
   p { color: #4b5466; margin: 0 0 22px; }
-  a { display: inline-block; background: #1e63b5; color: #fff; text-decoration: none; font-weight: 700; padding: 12px 20px; border-radius: 10px; }
+  .nf a { display: inline-block; background: #1e63b5; color: #fff; text-decoration: none; font-weight: 700; padding: 12px 20px; border-radius: 10px; }
 </style>
 </head>
 <body>
-<div>
-  <h1>Page not found</h1>
-  <p>The link may be broken or the page may have moved.</p>
-  <a id="home" href="/">Go to the CEED Mock Test</a>
+<div class="nf">
+  <div>
+    <h1>Page not found</h1>
+    <p>The link may be broken or the page may have moved.</p>
+    <a id="home" href="/">Go to the CEED Mock Test</a>
+  </div>
 </div>
 <script>
   // On a GitHub project site the home page is /<repository-name>/
   var parts = location.pathname.split('/').filter(Boolean);
-  if (/\.github\.io$/.test(location.hostname) && parts.length) document.getElementById('home').href = '/' + parts[0] + '/';
+  var base = (/\.github\.io$/.test(location.hostname) && parts.length) ? '/' + parts[0] + '/' : '/';
+  document.getElementById('home').href = base;
+  // The creator strip at the top (same file as on every other page)
+  var s = document.createElement('script');
+  s.src = base + 'assets/credit.js';
+  document.body.insertBefore(s, document.body.firstChild);
 </script>
 </body>
 </html>

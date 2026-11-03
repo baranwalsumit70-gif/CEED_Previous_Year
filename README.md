@@ -1,5 +1,7 @@
 # CEED Mock Test
 
+**Created by [Sumit Baranwal](https://www.linkedin.com/in/baranwalsumit/)** · [Join the CEED / NID Prep group on WhatsApp](https://chat.whatsapp.com/KRwNf9wtZzXHsLG4bHB9PU) · [Topmate: sumit_baranwal](https://topmate.io/sumit_baranwal/)
+
 Free online mock tests of CEED previous-year papers (Part A) in the real computer-based exam interface, with a detailed analysis after every attempt.
 
 **Live site:** https://baranwalsumit70-gif.github.io/CEED_Previous_Year_Mock/
@@ -13,6 +15,7 @@ Free online mock tests of CEED previous-year papers (Part A) in the real compute
 | `result.html` | The analysis a student sees after submitting |
 | `admin.html` | Admin page (passcode): results & ranks, students, papers & questions |
 | `assets/` | Styles and scripts. `assets/config.js` connects the site to the database |
+| `assets/credit.js` | The "Created by Sumit Baranwal" strip at the top of every page (LinkedIn, WhatsApp group and Topmate links). Change the links here |
 | `questions/` | Question screenshots, one folder per paper: CEED 2017 and CEED 2022–2026 (Part A, 259 questions) |
 | `supabase/schema.sql` | Database tables and functions (already installed in Supabase) |
 | `.github/workflows/keep-alive.yml` | Pings the database once a day so it never goes to sleep |
