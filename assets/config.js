@@ -4,5 +4,5 @@
 window.CEED_CONFIG = {
   SUPABASE_URL: 'https://nyxjaxlvrvyybgbeohbc.supabase.co',
   SUPABASE_KEY: 'sb_publishable_ad3077JOMhTmqMHzJA1_Lg_fL-QDcp_',
-  SITE_NAME: 'CEED Mock Test',
+  SITE_NAME: 'CEED & UCEED Mock Test',
 };

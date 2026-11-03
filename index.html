@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CEED Mock Test · Previous-year papers in the real exam interface</title>
-<meta name="description" content="Practise CEED previous-year Part A papers (2017 and 2022 to 2026) in a real computer-based exam interface (NAT, MSQ, MCQ) and get a detailed analysis of every attempt.">
+<title>CEED &amp; UCEED Mock Test · Previous-year papers in the real exam interface</title>
+<meta name="description" content="Practise CEED (2017, 2020 to 2026) and UCEED (2023 to 2026) previous-year Part A papers in a real computer-based exam interface (NAT, MSQ, MCQ) and get a detailed analysis of every attempt.">
 <meta name="author" content="Sumit Baranwal">
-<meta property="og:title" content="CEED Mock Test · Previous-year papers">
-<meta property="og:description" content="Real CEED exam interface, 60-minute timer, auto-scoring and a detailed analysis of every attempt.">
+<meta property="og:title" content="CEED &amp; UCEED Mock Test · Previous-year papers">
+<meta property="og:description" content="Real exam interface, official time limit, auto-scoring with the official answer keys and a detailed analysis of every attempt.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' rx='7' fill='%231e63b5'/%3E%3Cpath d='M9 11h14M9 16h9M9 21h11' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'/%3E%3Ccircle cx='23' cy='21' r='2.6' fill='%23ffd34d'/%3E%3C/svg%3E">
 <script src="assets/config.js"></script>
 <style>
@@ -160,6 +160,21 @@
   .mine-foot { padding: 14px 18px; font-size: 13.5px; color: var(--muted); border-top: 1px solid var(--line); }
   .foot-links a { color: var(--muted); text-decoration: underline; }
   .pattern-note { color: var(--ink-2); font-size: 14.5px; margin-top: 14px; max-width: 860px; }
+  .pattern-title { font-size: 20px; margin: 30px 0 12px; display: flex; align-items: baseline; gap: 6px 12px; flex-wrap: wrap; }
+  .pattern-title:first-of-type { margin-top: 0; }
+  .pattern-title span { font-size: 14.5px; font-weight: 600; color: var(--muted); letter-spacing: 0; }
+  .hidden { display: none !important; }
+
+  /* CEED / UCEED switch above the paper list */
+  .exam-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin: -12px 0 22px; }
+  .exam-tab { display: inline-flex; align-items: center; gap: 10px; padding: 11px 16px; border-radius: 12px; border: 1px solid var(--line); background: #fff; color: var(--ink); font: inherit; font-size: 15.5px; font-weight: 750; cursor: pointer; box-shadow: var(--shadow); transition: background .15s, border-color .15s; }
+  .exam-tab small { font-size: 13px; font-weight: 600; color: var(--muted); }
+  .exam-tab .count { font-size: 12.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--bg); color: var(--ink-2); }
+  .exam-tab:hover { border-color: var(--blue-100); background: var(--blue-50); }
+  .exam-tab[aria-selected="true"] { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .exam-tab[aria-selected="true"] small { color: #d4e5f9; }
+  .exam-tab[aria-selected="true"] .count { background: rgba(255,255,255,.2); color: #fff; }
+  .exam-note { grid-column: 1 / -1; color: var(--ink-2); font-size: 14.5px; margin-top: -6px; }
 
   @media (max-width: 960px) {
     .hero .wrap, .showcase, .papers, .papers.many { grid-template-columns: 1fr; }
@@ -176,6 +191,12 @@
     .band { padding: 28px 22px; }
     .hero-stats { gap: 20px; }
     .shots .frame + .frame { margin-left: 0; margin-top: 16px; width: 100%; }
+    .exam-tab { flex: 1 1 140px; justify-content: center; flex-wrap: wrap; gap: 4px 8px; padding: 10px 12px; }
+  }
+  @media (max-width: 440px) {
+    .nav-start { display: none; }
+    .brand { font-size: 16px; }
+    .cta-row .btn { flex: 1 1 100%; }
   }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn:hover { transform: none; } .dot.wait { animation: none; } }
 </style>
@@ -185,9 +206,9 @@
 
 <nav class="nav" aria-label="Main">
   <div class="wrap">
-    <a class="brand" href="#top" aria-label="CEED Mock Test home">
+    <a class="brand" href="#top" aria-label="CEED &amp; UCEED Mock Test home">
       <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="7" fill="#1e63b5"/><path d="M9 11h14M9 16h9M9 21h11" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="23" cy="21" r="2.6" fill="#ffd34d"/></svg>
-      CEED Mock Test
+      CEED &amp; UCEED Mock Test
     </a>
     <div class="nav-links">
       <a href="#papers">Papers</a>
@@ -196,26 +217,27 @@
       <a href="#faq">FAQ</a>
       <a href="#my">My results</a>
     </div>
-    <a class="btn btn-primary btn-sm" data-start href="#papers">Start test</a>
+    <a class="btn btn-primary btn-sm nav-start" href="#papers">Start test</a>
   </div>
 </nav>
 
 <header class="hero" id="top">
   <div class="wrap">
     <div>
-      <span class="eyebrow">Free · CEED Part A practice</span>
-      <h1>Practise CEED previous-year papers in the <span>real exam interface</span>.</h1>
+      <span class="eyebrow">Free · CEED &amp; UCEED Part A practice</span>
+      <h1>Practise CEED &amp; UCEED previous-year papers in the <span>real exam interface</span>.</h1>
       <p class="lede">Same sections, timer and question palette as the computer-based test. Every question is the original paper, and you get a detailed analysis after each attempt.</p>
       <div class="cta-row">
-        <a class="btn btn-light" data-start href="#papers">Start the mock test →</a>
+        <a class="btn btn-light" data-exam-link="CEED" href="#ceed">CEED mock (M.Des) →</a>
+        <a class="btn btn-light" data-exam-link="UCEED" href="#uceed">UCEED mock (B.Des) →</a>
         <a class="btn btn-ghost" href="#pattern">See exam pattern</a>
       </div>
       <div class="status" role="status" aria-live="polite"><span class="dot wait" id="dot"></span><span id="status-text">Connecting to the test server…</span></div>
       <div class="hero-stats">
-        <div><b>6</b><span>papers</span></div>
-        <div><b>259</b><span>questions</span></div>
-        <div><b>3</b><span>sections</span></div>
-        <div><b>60</b><span>minutes each</span></div>
+        <div><b data-stat="papers">12</b><span>papers</span></div>
+        <div><b data-stat="questions">580</b><span>questions</span></div>
+        <div><b>2</b><span>exams: CEED &amp; UCEED</span></div>
+        <div><b>3</b><span>sections each</span></div>
       </div>
     </div>
     <div class="frame" aria-hidden="false">
@@ -230,10 +252,11 @@
     <div class="wrap">
       <div class="sec-head">
         <div class="kicker">Available papers</div>
-        <h2>Original CEED papers, question by question</h2>
+        <h2>Original CEED and UCEED papers, question by question</h2>
         <p>Every question is shown exactly as it appeared in the official paper. Answers are checked automatically with each year's official answer key and marking scheme.</p>
       </div>
-      <div class="papers" id="paper-list">
+      <div class="exam-tabs hidden" id="exam-tabs" role="tablist" aria-label="Choose the exam"></div>
+      <div class="papers" id="paper-list" role="tabpanel">
         <div class="card skeleton" role="status">Loading the papers…</div>
       </div>
     </div>
@@ -253,10 +276,11 @@
   <section id="pattern" style="background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
     <div class="wrap">
       <div class="sec-head">
-        <div class="kicker">Exam pattern · CEED 2024 onwards (Part A)</div>
-        <h2>Three sections, one 60-minute timer</h2>
-        <p>Move freely between sections. Answers marked for review still count if you have answered them.</p>
+        <div class="kicker">Exam pattern · Part A, 2024 onwards</div>
+        <h2>Three sections, one timer</h2>
+        <p>CEED Part A lasts 60 minutes and UCEED Part A lasts 2 hours. Move freely between sections. Answers marked for review still count if you have answered them.</p>
       </div>
+      <h3 class="pattern-title">CEED <span>for M.Des · 60 minutes · 150 marks</span></h3>
       <div class="card table-card"><div class="table-scroll">
         <table>
           <thead><tr><th>Section</th><th>Question type</th><th>Questions</th><th>Correct</th><th>Wrong</th><th>Total</th></tr></thead>
@@ -268,7 +292,19 @@
           </tbody>
         </table>
       </div></div>
-      <p class="pattern-note">Older papers keep their own marking: CEED 2022 and 2023 had 41 questions for 100 marks (NAT +3; MSQ +3, −0.2; MCQ +2, −0.5), and CEED 2017 had 45 questions for 100 marks. Every mock uses the marking scheme of its own year.</p>
+      <h3 class="pattern-title">UCEED <span>for B.Des · 2 hours · 200 marks</span></h3>
+      <div class="card table-card"><div class="table-scroll">
+        <table>
+          <thead><tr><th>Section</th><th>Question type</th><th>Questions</th><th>Correct</th><th>Wrong</th><th>Total</th></tr></thead>
+          <tbody>
+            <tr><td><span class="sw" style="background:#2a78d6"></span><b>Section 1</b></td><td>NAT · type the number on a keypad</td><td>14</td><td class="pos">+4</td><td>0</td><td>56</td></tr>
+            <tr><td><span class="sw" style="background:#eb6834"></span><b>Section 2</b></td><td>MSQ · one or more options correct</td><td>15</td><td class="pos">+4 <span style="color:var(--muted);font-weight:500">(+1 per correct option if no wrong one)</span></td><td class="neg">−1</td><td>60</td></tr>
+            <tr><td><span class="sw" style="background:#1baf7a"></span><b>Section 3</b></td><td>MCQ · only one option correct</td><td>28</td><td class="pos">+3</td><td class="neg">−0.71</td><td>84</td></tr>
+            <tr class="total"><td>Total</td><td></td><td>57</td><td></td><td></td><td>200</td></tr>
+          </tbody>
+        </table>
+      </div></div>
+      <p class="pattern-note">Older papers keep their own pattern: CEED 2020 to 2023 had 41 questions for 100 marks (NAT +3; MSQ +3, −0.2; MCQ +2, −0.5), CEED 2017 had 45 questions for 100 marks, and UCEED 2023 had 68 questions for 240 marks in 2 hours 30 minutes. Every mock uses the marking scheme and time limit of its own year.</p>
     </div>
   </section>
 
@@ -294,7 +330,7 @@
     <div class="wrap showcase">
       <div>
         <div class="kicker">After you submit</div>
-        <h2 style="font-size:clamp(26px,3.2vw,36px);margin:8px 0 12px">An analysis that shows how you used your 60 minutes</h2>
+        <h2 style="font-size:clamp(26px,3.2vw,36px);margin:8px 0 12px">An analysis that shows how you used your time</h2>
         <p style="color:var(--ink-2);font-size:17px">Not just a score. See which question you were on at what time, where you lost marks and what to revise first.</p>
         <ul class="ticks">
           <li><span><b>Correct, wrong and unattempted</b> questions, accuracy and marks lost to negative marking</span></li>
@@ -321,7 +357,7 @@
       <div class="steps">
         <div class="card step"><h3>Enter your name &amp; email</h3><p>No password or OTP. Use the same email every time so your attempts stay together.</p></div>
         <div class="card step"><h3>Read the instructions</h3><p>The same two instruction pages and declaration as the real exam.</p></div>
-        <div class="card step"><h3>Attempt in 60 minutes</h3><p>Answer, mark for review and move between sections. The test submits itself when time runs out.</p></div>
+        <div class="card step"><h3>Attempt in the real time limit</h3><p>60 minutes for CEED, 2 hours for UCEED. Answer, mark for review and move between sections. The test submits itself when time runs out.</p></div>
         <div class="card step"><h3>Study your analysis</h3><p>Review every question, your timeline and your rank, then reattempt when you're ready.</p></div>
       </div>
     </div>
@@ -336,7 +372,8 @@
         <details><summary>What if my internet or power goes off during the test?</summary><p>Your answers are saved to the server as you go. Open this site again on the same device and click Resume, or start the same paper with the same email on another device. The test continues where you stopped, and the timer pauses while you are away.</p></details>
         <details><summary>Can I attempt a paper again?</summary><p>Yes. Each attempt gets its own analysis. Your rank always compares first attempts, so it stays fair.</p></details>
         <details><summary>Where can I see my results later?</summary><p>Under <b>My results</b> on this page, on the device you used for the test. On a result page, click <b>Copy result link</b> and keep the link to open your analysis on any device.</p></details>
-        <details><summary>Which papers are available?</summary><p>Part A of CEED 2017 and CEED 2022 to 2026, each with its official answer key. Part B is a drawing test checked by examiners, so it is not included.</p></details>
+        <details><summary>Which papers are available?</summary><p>Part A of CEED 2017 and CEED 2020 to 2026, and Part A of UCEED 2023 to 2026, each with its official answer key. Part B is a drawing test checked by examiners, so it is not included.</p></details>
+        <details><summary>What is the difference between CEED and UCEED?</summary><p>Both are design entrance exams conducted by IIT Bombay. CEED is for postgraduate admissions (M.Des and PhD) and UCEED is for undergraduate admissions (B.Des). Both have a computer-based Part A with NAT, MSQ and MCQ sections, and that is what you can practise here. UCEED Part A is longer (2 hours) and has more questions.</p></details>
         <details><summary>Some questions mention an animated GIF. What happens to them?</summary><p>A few questions showed an animation in the real exam. Animations can't be played here, so when a question can't be answered from a still image, everyone gets full marks for it. The question still shows so you know what was asked.</p></details>
         <details><summary>Does clicking a question number save my answer?</summary><p>No, just like the real exam. Use <b>Save &amp; Next</b> or <b>Mark for Review &amp; Next</b> to save an answer.</p></details>
       </div>
@@ -346,8 +383,8 @@
   <section style="padding-top:20px">
     <div class="wrap">
       <div class="band">
-        <div><h2>Take a CEED mock now</h2><p>6 papers · 60 minutes each · instant analysis</p></div>
-        <a class="btn btn-light" data-start href="#papers">Start the mock test →</a>
+        <div><h2>Take a CEED or UCEED mock now</h2><p><span data-stat="papers">12</span> papers · official answer keys · instant analysis</p></div>
+        <a class="btn btn-light" href="#papers">Choose a paper →</a>
       </div>
     </div>
   </section>
@@ -355,8 +392,8 @@
 
 <footer>
   <div class="wrap">
-    <span class="foot-links">© <span id="year">2026</span> CEED Mock Test · <a href="admin.html">Admin</a></span>
-    <span>Independent practice platform, not affiliated with IIT Bombay or the official CEED exam. Questions © IIT Bombay, used for practice.</span>
+    <span class="foot-links">© <span id="year">2026</span> CEED &amp; UCEED Mock Test · <a href="admin.html">Admin</a></span>
+    <span>Independent practice platform, not affiliated with IIT Bombay or the official CEED and UCEED exams. Questions © IIT Bombay, used for practice.</span>
   </div>
 </footer>
 

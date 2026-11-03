@@ -1,10 +1,63 @@
-// Home page: live list of papers and the attempts taken on this device.
+// Home page: live list of papers (grouped by exam: CEED / UCEED) and the attempts taken on this device.
 import { rpc, el, $, $$, savedAttempts, forgetAttempt, fmtDate, num, clock } from './common.js';
 
 const dot = $('#dot');
 const statusText = $('#status-text');
 const setStatus = (state, msg) => { dot.className = `dot ${state}`; statusText.textContent = msg; };
 $('#year').textContent = new Date().getFullYear();
+
+const EXAM_FOR = { CEED: 'for M.Des', UCEED: 'for B.Des' };
+const EXAM_NOTE = {
+  CEED: 'CEED Part A: 60 minutes · Section I NAT, Section II MSQ, Section III MCQ.',
+  UCEED: 'UCEED Part A: 2 hours (2 hours 30 minutes in 2023) · Section 1 NAT, Section 2 MSQ, Section 3 MCQ.',
+};
+const TAB_KEY = 'ceed_exam_tab';
+let PAPERS = null;
+let MINE = [];
+let current = examFromHash() || readTab();
+
+function readTab() { try { return localStorage.getItem(TAB_KEY) || null; } catch (_) { return null; } }
+function saveTab(exam) { try { localStorage.setItem(TAB_KEY, exam); } catch (_) { /* storage unavailable */ } }
+function examFromHash() {
+  const h = decodeURIComponent(location.hash.slice(1)).toUpperCase();
+  return h === 'CEED' || h === 'UCEED' ? h : null;
+}
+const examOf = (p) => (p.exam || 'Other').trim() || 'Other';
+const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+function groups() {
+  const by = new Map();
+  for (const p of PAPERS) {
+    const k = examOf(p);
+    if (!by.has(k)) by.set(k, []);
+    by.get(k).push(p);
+  }
+  const order = (k) => (k === 'CEED' ? 0 : k === 'UCEED' ? 1 : 2);
+  return [...by.entries()].sort((a, b) => order(a[0]) - order(b[0]) || a[0].localeCompare(b[0]))
+    .map(([exam, papers]) => ({ exam, papers }));
+}
+
+function selectExam(exam, fromUser) {
+  if (PAPERS) {
+    const g = groups().find((x) => x.exam.toUpperCase() === String(exam).toUpperCase());
+    if (g) exam = g.exam;
+  }
+  current = exam;
+  saveTab(exam);
+  if (fromUser) history.replaceState(null, '', `#${exam.toLowerCase()}`);
+  if (PAPERS) renderPapers();
+}
+
+// "CEED mock" / "UCEED mock" buttons in the hero
+$$('[data-exam-link]').forEach((a) => a.addEventListener('click', (e) => {
+  e.preventDefault();
+  selectExam(a.dataset.examLink, true);
+  $('#papers').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}));
+window.addEventListener('hashchange', () => {
+  const ex = examFromHash();
+  if (ex) { selectExam(ex, false); $('#papers').scrollIntoView({ block: 'start' }); }
+});
 
 (async function init() {
   let papers;
@@ -22,68 +75,102 @@ $('#year').textContent = new Date().getFullYear();
   }
   clearTimeout(slow);
   setStatus('ok', papers.length ? 'Test server is ready' : 'Test server is ready · no paper is published yet');
+  if (papers.length) {
+    $$('[data-stat="papers"]').forEach((b) => { b.textContent = papers.length; });
+    $$('[data-stat="questions"]').forEach((b) => { b.textContent = papers.reduce((s, p) => s + (p.questions || 0), 0); });
+  }
 
   // attempts saved on this device (each one is opened by its secret key)
   const saved = savedAttempts();
-  let mine = [];
   if (saved.length) {
     try {
-      mine = await rpc('ceed_my_attempts', { p_tokens: saved.map((s) => s.token) });
-      const alive = new Set(mine.map((m) => m.token));
+      MINE = await rpc('ceed_my_attempts', { p_tokens: saved.map((s) => s.token) });
+      const alive = new Set(MINE.map((m) => m.token));
       saved.filter((s) => !alive.has(s.token)).forEach((s) => forgetAttempt(s.token)); // deleted by the admin
     } catch (_) {
-      mine = [];
+      MINE = [];
     }
   }
-  renderPapers(papers, mine);
-  renderMine(mine, papers);
+  PAPERS = papers;
+  renderPapers();
+  renderMine(MINE, papers);
+  // the lists above may have pushed a linked section (#uceed, #pattern, #faq, #my…) down: go back to it
+  const id = decodeURIComponent(location.hash.slice(1));
+  const target = examFromHash() ? $('#papers') : (id ? document.getElementById(id) : null);
+  if (target) target.scrollIntoView({ block: 'start' });
 })();
 
-function renderPapers(papers, mine) {
+function renderPapers() {
   const box = $('#paper-list');
+  const tabs = $('#exam-tabs');
   box.innerHTML = '';
-  box.classList.toggle('many', papers.length > 1);
-  if (!papers.length) {
+  if (!PAPERS.length) {
+    tabs.classList.add('hidden');
     box.append(el('div', { class: 'card note-card' }, 'No paper is published yet. Please check again soon.'));
     return;
   }
-  let firstHref = null;
-  for (const p of papers) {
-    const mineHere = mine.filter((m) => m.paper_id === p.id);
-    const open = mineHere.find((m) => m.status === 'in_progress');
-    const done = mineHere.filter((m) => m.status === 'submitted').sort((a, b) => (b.submitted_at || 0) - (a.submitted_at || 0));
-    const acts = el('div', { class: 'acts' });
-    let href;
-    if (open) {
-      href = `exam.html#t=${open.token}`;
-      acts.append(el('a', { class: 'btn btn-primary', href }, `Resume test · ${clock(open.remaining_ms)} left`));
-    } else if (done.length && !p.allow_reattempt) {
-      acts.append(el('a', { class: 'btn btn-primary', 'aria-disabled': 'true', tabindex: '-1' }, 'Already attempted'));
-    } else {
-      href = `exam.html?paper=${encodeURIComponent(p.id)}`;
-      acts.append(el('a', { class: 'btn btn-primary', href }, done.length ? 'Reattempt →' : `Attempt ${p.title.replace(/\s+—.*$/, '')} →`));
-    }
-    if (done.length) {
-      acts.append(el('a', { class: 'btn btn-outline', href: `result.html#t=${done[0].token}` }, 'Last result'),
-        el('span', { class: 'last' }, `${num(done[0].score)} / ${num(done[0].max_score)} · ${fmtDate(done[0].submitted_at, false)}`));
-    }
-    if (!firstHref && href) firstHref = href;
-    box.append(el('article', { class: 'card paper' },
-      el('div', { class: 'top' },
-        el('div', {}, el('h3', {}, p.title), p.description ? el('p', { class: 'desc' }, p.description) : null),
-        el('span', { class: `tag ${open ? 'amber' : ''}` }, open ? 'In progress' : 'Live')),
-      el('div', { class: 'chips' },
-        el('span', { class: 'chip' }, `${p.questions} questions`),
-        el('span', { class: 'chip' }, `${p.sections} section${p.sections === 1 ? '' : 's'}`),
-        el('span', { class: 'chip' }, `${p.duration_min} minutes`),
-        el('span', { class: 'chip' }, `${num(p.max_marks)} marks`)),
-      acts));
+  const all = groups();
+  let g = all.find((x) => current && x.exam.toUpperCase() === current.toUpperCase());
+  if (!g) g = all[0];
+  current = g.exam;
+
+  tabs.innerHTML = '';
+  tabs.classList.toggle('hidden', all.length < 2);
+  for (const x of all) {
+    const sel = x === g;
+    tabs.append(el('button', {
+      class: 'exam-tab', type: 'button', role: 'tab', id: `tab-${slug(x.exam)}`, 'aria-selected': String(sel), 'aria-controls': 'paper-list',
+      tabindex: sel ? '0' : '-1',
+      onclick: () => { selectExam(x.exam, true); const b = $(`#tab-${slug(x.exam)}`); if (b) b.focus(); },
+    }, x.exam, EXAM_FOR[x.exam] ? el('small', {}, EXAM_FOR[x.exam]) : null,
+    el('span', { class: 'count' }, `${x.papers.length} paper${x.papers.length === 1 ? '' : 's'}`)));
   }
-  if (papers.length === 1) {
+  // arrow keys move between the exam tabs
+  tabs.onkeydown = (e) => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    const i = all.indexOf(g) + (e.key === 'ArrowRight' ? 1 : -1);
+    const next = all[(i + all.length) % all.length];
+    selectExam(next.exam, true);
+    const b = $(`#tab-${slug(next.exam)}`);
+    if (b) b.focus();
+  };
+
+  box.setAttribute('aria-labelledby', `tab-${slug(g.exam)}`);
+  box.classList.toggle('many', g.papers.length > 1);
+  if (all.length > 1 && EXAM_NOTE[g.exam]) box.append(el('p', { class: 'exam-note' }, EXAM_NOTE[g.exam]));
+  for (const p of g.papers) box.append(paperCard(p));
+  if (PAPERS.length === 1) {
     box.append(el('aside', { class: 'card soon' }, el('h3', {}, 'More years coming'),
       el('p', {}, 'Further previous-year papers are being added. They will appear here as soon as they are ready.')));
   }
-  if (firstHref) $$('[data-start]').forEach((a) => { a.href = firstHref; });
+}
+
+function paperCard(p) {
+  const mineHere = MINE.filter((m) => m.paper_id === p.id);
+  const open = mineHere.find((m) => m.status === 'in_progress');
+  const done = mineHere.filter((m) => m.status === 'submitted').sort((a, b) => (b.submitted_at || 0) - (a.submitted_at || 0));
+  const acts = el('div', { class: 'acts' });
+  if (open) {
+    acts.append(el('a', { class: 'btn btn-primary', href: `exam.html#t=${open.token}` }, `Resume test · ${clock(open.remaining_ms)} left`));
+  } else if (done.length && !p.allow_reattempt) {
+    acts.append(el('a', { class: 'btn btn-primary', 'aria-disabled': 'true', tabindex: '-1' }, 'Already attempted'));
+  } else {
+    acts.append(el('a', { class: 'btn btn-primary', href: `exam.html?paper=${encodeURIComponent(p.id)}` }, done.length ? 'Reattempt →' : `Attempt ${p.title.replace(/\s+—.*$/, '')} →`));
+  }
+  if (done.length) {
+    acts.append(el('a', { class: 'btn btn-outline', href: `result.html#t=${done[0].token}` }, 'Last result'),
+      el('span', { class: 'last' }, `${num(done[0].score)} / ${num(done[0].max_score)} · ${fmtDate(done[0].submitted_at, false)}`));
+  }
+  return el('article', { class: 'card paper' },
+    el('div', { class: 'top' },
+      el('div', {}, el('h3', {}, p.title), p.description ? el('p', { class: 'desc' }, p.description) : null),
+      el('span', { class: `tag ${open ? 'amber' : ''}` }, open ? 'In progress' : 'Live')),
+    el('div', { class: 'chips' },
+      el('span', { class: 'chip' }, `${p.questions} questions`),
+      el('span', { class: 'chip' }, `${p.sections} section${p.sections === 1 ? '' : 's'}`),
+      el('span', { class: 'chip' }, `${p.duration_min} minutes`),
+      el('span', { class: 'chip' }, `${num(p.max_marks)} marks`)),
+    acts);
 }
 
 function renderMine(mine, papers) {
