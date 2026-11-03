@@ -1,0 +1,77 @@
+/* ===== Admin ===== */
+.admin-page { max-width: 1240px; }
+.admin-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 22px; overflow-x: auto; }
+.admin-tabs a { padding: 10px 14px; font-weight: 650; color: var(--text-2); border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+.admin-tabs a:hover { text-decoration: none; color: var(--text); }
+.admin-tabs a.active { color: var(--primary); border-bottom-color: var(--primary); }
+.stat-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin-bottom: 20px; }
+.stat { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow); }
+.stat .l { font-size: 12.5px; color: var(--text-2); font-weight: 600; }
+.stat .v { font-size: 26px; font-weight: 700; margin-top: 2px; }
+.toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+.toolbar .input { min-height: 38px; width: auto; }
+.switch { position: relative; display: inline-flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600; font-size: 14px; }
+.switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.switch .track { width: 40px; height: 22px; border-radius: 999px; background: #cfd5df; position: relative; transition: background .15s; flex: none; }
+.switch .track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .15s; box-shadow: 0 1px 2px rgba(0, 0, 0, .2); }
+.switch input:checked + .track { background: var(--primary); }
+.switch input:checked + .track::after { transform: translateX(18px); }
+.switch input:focus-visible + .track { outline: 2px solid var(--primary); outline-offset: 2px; }
+.form-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 14px; }
+.form-grid .span-2 { grid-column: span 2; }
+.form-grid .span-4 { grid-column: span 4; }
+.toggles { display: flex; gap: 22px; flex-wrap: wrap; margin: 4px 0 6px; }
+
+.sec-card { margin-top: 16px; }
+.sec-card .card-head { background: var(--surface-2); border-radius: var(--radius) var(--radius) 0 0; }
+.sec-card .card-head h3 { font-size: 16px; }
+.q-row { display: grid; grid-template-columns: 54px 150px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--border); }
+.q-row:last-child { border-bottom: 0; }
+.q-row .qn { font-weight: 700; font-size: 15px; }
+.q-thumb { width: 150px; height: 64px; border: 1px solid var(--border); border-radius: 6px; background: #fff left top / 100% auto no-repeat; cursor: zoom-in; }
+.q-meta { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; font-size: 13px; min-width: 0; }
+.q-meta .key { font-weight: 700; color: var(--text); }
+.q-actions { display: flex; gap: 4px; }
+.q-actions .btn { min-height: 30px; padding: 2px 9px; font-size: 12.5px; }
+.add-q { padding: 12px 16px; display: flex; gap: 10px; }
+
+/* question editor */
+.qe { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 18px; }
+.drop { border: 2px dashed var(--border-strong); border-radius: 10px; min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 14px; cursor: pointer; background: var(--surface-2); color: var(--text-2); position: relative; }
+.drop.over { border-color: var(--primary); background: var(--primary-50); }
+.drop img { max-width: 100%; max-height: 380px; border-radius: 6px; border: 1px solid var(--border); background: #fff; }
+.drop .hint b { color: var(--text); }
+.kbd { display: inline-block; border: 1px solid var(--border-strong); border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; font-size: 12px; background: #fff; }
+.opt-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.opt-chip { width: 44px; height: 40px; border-radius: 8px; border: 1px solid var(--border-strong); background: #fff; font-weight: 700; cursor: pointer; }
+.opt-chip.on { background: var(--ok); border-color: var(--ok); color: #fff; }
+.seg-type { display: inline-grid; grid-auto-flow: column; background: #e9edf3; border-radius: 8px; padding: 3px; gap: 2px; }
+.seg-type button { border: 0; background: transparent; padding: 6px 14px; border-radius: 6px; font-weight: 650; cursor: pointer; color: var(--text-2); }
+.seg-type button.on { background: #fff; color: var(--primary); box-shadow: 0 1px 2px rgba(0, 0, 0, .08); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+.inline-note { font-size: 12.5px; color: var(--muted); margin-top: -6px; margin-bottom: 12px; }
+
+@media (max-width: 1100px) { .stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 860px) {
+  .qe { grid-template-columns: 1fr; }
+  .form-grid { grid-template-columns: 1fr 1fr; }
+  .form-grid .span-4 { grid-column: span 2; }
+  .q-row { grid-template-columns: 40px minmax(0, 1fr); }
+  .q-row .q-thumb { display: none; }
+  .q-row .q-actions { grid-column: span 2; }
+}
+@media (max-width: 560px) { .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* passcode lock */
+.lock-card { max-width: 420px; margin: 8vh auto 0; }
+.lock-card h1 { font-size: 24px; margin: 12px 0 6px; }
+.lock-card > .muted { margin-bottom: 18px; }
+.lock-card .check { margin: 2px 0 10px; font-size: 14px; color: var(--text-2); }
+.lock-ic { width: 48px; height: 48px; border-radius: 12px; background: var(--primary-50); color: var(--primary); display: grid; place-items: center; }
+.share-row { display: flex; gap: 8px; }
+.share-row .input { flex: 1; min-width: 0; }
+/* rank list */
+.rank-pill { display: inline-grid; place-items: center; min-width: 28px; height: 24px; padding: 0 7px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); font-weight: 700; font-size: 13px; }
+.rank-pill.top1 { background: #fff4cc; border-color: #f0d36b; color: #7a5a00; }
+.rank-pill.top2 { background: #eef1f5; border-color: #cbd2dd; color: #3d4757; }
+.rank-pill.top3 { background: #fbe9dc; border-color: #ebc2a2; color: #7a3d12; }

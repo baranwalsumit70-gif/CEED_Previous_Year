@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found · CEED Mock Test</title>
+<style>
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; background: #f3f5f9; color: #1b2230; display: grid; place-items: center; min-height: 100vh; text-align: center; padding: 16px; box-sizing: border-box; }
+  h1 { font-size: 26px; margin: 0 0 8px; }
+  p { color: #4b5466; margin: 0 0 22px; }
+  a { display: inline-block; background: #1e63b5; color: #fff; text-decoration: none; font-weight: 700; padding: 12px 20px; border-radius: 10px; }
+</style>
+</head>
+<body>
+<div>
+  <h1>Page not found</h1>
+  <p>The link may be broken or the page may have moved.</p>
+  <a id="home" href="/">Go to the CEED Mock Test</a>
+</div>
+<script>
+  // On a GitHub project site the home page is /<repository-name>/
+  var parts = location.pathname.split('/').filter(Boolean);
+  if (/\.github\.io$/.test(location.hostname) && parts.length) document.getElementById('home').href = '/' + parts[0] + '/';
+</script>
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CEED Mock Test · Previous-year papers in the real exam interface</title>
+<meta name="description" content="Practise CEED previous-year Part A papers in a real computer-based exam interface (NAT, MSQ, MCQ) and get a detailed analysis of every attempt.">
+<meta property="og:title" content="CEED Mock Test · Previous-year papers">
+<meta property="og:description" content="Real CEED exam interface, 60-minute timer, auto-scoring and a detailed analysis of every attempt.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' rx='7' fill='%231e63b5'/%3E%3Cpath d='M9 11h14M9 16h9M9 21h11' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'/%3E%3Ccircle cx='23' cy='21' r='2.6' fill='%23ffd34d'/%3E%3C/svg%3E">
+<script src="assets/config.js"></script>
+<style>
+  :root {
+    color-scheme: light;
+    --blue: #1e63b5; --blue-600: #17518f; --blue-50: #eaf2fc; --blue-100: #d4e5f9;
+    --navy: #0f3566; --ink: #17202e; --ink-2: #4a5466; --muted: #7a8396;
+    --line: #e2e6ee; --bg: #f5f7fb; --card: #fff;
+    --green: #0ca30c; --red: #d03b3b; --amber: #fab219;
+    --radius: 14px; --shadow: 0 1px 2px rgba(16,24,40,.05), 0 8px 24px rgba(16,24,40,.07);
+    --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; font-family: var(--font); color: var(--ink); background: var(--bg); line-height: 1.55; font-size: 16px; -webkit-font-smoothing: antialiased; }
+  a { color: var(--blue); text-decoration: none; }
+  img { max-width: 100%; height: auto; display: block; }
+  h1, h2, h3 { margin: 0; line-height: 1.15; letter-spacing: -0.015em; }
+  p { margin: 0; }
+  :focus-visible { outline: 3px solid #ffd34d; outline-offset: 2px; border-radius: 6px; }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+
+  /* nav */
+  .nav { position: sticky; top: 0; z-index: 20; background: rgba(255,255,255,.92); backdrop-filter: saturate(1.4) blur(10px); border-bottom: 1px solid var(--line); }
+  .nav .wrap { display: flex; align-items: center; gap: 18px; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 750; color: var(--ink); font-size: 17px; }
+  .nav-links { display: flex; gap: 4px; margin-left: auto; }
+  .nav-links a { color: var(--ink-2); font-weight: 600; font-size: 14.5px; padding: 8px 12px; border-radius: 8px; }
+  .nav-links a:hover { background: var(--bg); color: var(--ink); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 10px; font-weight: 700; font-size: 15px; padding: 12px 20px; border: 1px solid transparent; cursor: pointer; transition: background .15s, transform .15s, box-shadow .15s; white-space: nowrap; }
+  .btn:hover { transform: translateY(-1px); }
+  .btn-primary { background: var(--blue); color: #fff; box-shadow: 0 6px 16px rgba(30,99,181,.28); }
+  .btn-primary:hover { background: var(--blue-600); }
+  .btn-light { background: #fff; color: var(--blue); }
+  .btn-ghost { background: rgba(255,255,255,.1); color: #fff; border-color: rgba(255,255,255,.35); }
+  .btn-ghost:hover { background: rgba(255,255,255,.18); }
+  .btn-sm { padding: 9px 14px; font-size: 14px; }
+
+  /* hero */
+  .hero { color: #fff; background: radial-gradient(900px 420px at 0% 0%, #2f7fd6 0%, transparent 60%), linear-gradient(160deg, #164a8a 0%, var(--navy) 100%); overflow: hidden; }
+  .hero .wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 48px; align-items: center; padding-top: 64px; padding-bottom: 72px; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #cfe1f7; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); padding: 6px 12px; border-radius: 999px; }
+  .hero h1 { font-size: clamp(32px, 4.6vw, 52px); margin: 18px 0 16px; }
+  .hero h1 span { color: #ffd34d; }
+  .hero .lede { color: #d6e4f6; font-size: 18px; max-width: 520px; }
+  .cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+  .status { display: inline-flex; align-items: center; gap: 9px; margin-top: 18px; font-size: 14px; color: #d6e4f6; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #9db4d3; flex: none; }
+  .dot.wait { background: #ffd34d; animation: pulse 1.2s ease-in-out infinite; }
+  .dot.ok { background: #3ddc6a; box-shadow: 0 0 0 4px rgba(61,220,106,.18); }
+  .dot.bad { background: #ff7a7a; }
+  @keyframes pulse { 50% { opacity: .35; } }
+  .hero-stats { display: flex; gap: 28px; margin-top: 34px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,.16); flex-wrap: wrap; }
+  .hero-stats b { display: block; font-size: 26px; }
+  .hero-stats span { font-size: 13px; color: #b9cde8; }
+  .frame { background: #fff; border-radius: 12px; box-shadow: 0 30px 60px rgba(4,18,40,.45); overflow: hidden; border: 1px solid rgba(255,255,255,.4); }
+  .frame-bar { height: 30px; background: #eef1f5; display: flex; align-items: center; gap: 6px; padding: 0 12px; }
+  .frame-bar i { width: 10px; height: 10px; border-radius: 50%; background: #d3d8e0; }
+  .frame-bar i:nth-child(1) { background: #ff6159; } .frame-bar i:nth-child(2) { background: #ffbd2e; } .frame-bar i:nth-child(3) { background: #28c941; }
+  .frame-bar span { margin-left: 10px; font-size: 11.5px; color: #7a8396; background: #fff; border-radius: 6px; padding: 2px 10px; flex: 1; max-width: 260px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+  /* sections */
+  section { padding: 76px 0; }
+  .sec-head { max-width: 720px; margin-bottom: 34px; }
+  .kicker { color: var(--blue); font-weight: 750; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
+  .sec-head h2 { font-size: clamp(26px, 3.2vw, 36px); margin: 8px 0 12px; }
+  .sec-head p { color: var(--ink-2); font-size: 17px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+
+  /* papers */
+  .papers { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 20px; }
+  .paper { padding: 26px; display: flex; flex-direction: column; gap: 16px; }
+  .paper .top { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+  .paper h3 { font-size: 22px; }
+  .tag { display: inline-flex; padding: 4px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 700; background: #e8f6ea; color: #157f1f; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { font-size: 13px; font-weight: 600; padding: 6px 11px; border-radius: 8px; background: var(--bg); border: 1px solid var(--line); color: var(--ink-2); }
+  .soon { padding: 26px; border-style: dashed; box-shadow: none; background: transparent; display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+  .soon h3 { font-size: 18px; }
+  .soon p { color: var(--ink-2); }
+
+  /* pattern table */
+  .table-card { overflow: hidden; }
+  .table-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; min-width: 640px; }
+  th, td { padding: 15px 18px; text-align: left; border-bottom: 1px solid var(--line); }
+  th { font-size: 12.5px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); background: #f8f9fc; }
+  tr:last-child td { border-bottom: 0; }
+  td b { font-weight: 700; }
+  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 8px; vertical-align: 1px; }
+  .neg { color: var(--red); font-weight: 700; }
+  .pos { color: #157f1f; font-weight: 700; }
+  .total td { background: #f8f9fc; font-weight: 700; }
+
+  /* features */
+  .features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+  .feature { padding: 22px; }
+  .feature .ic { width: 42px; height: 42px; border-radius: 11px; background: var(--blue-50); color: var(--blue); display: grid; place-items: center; margin-bottom: 14px; }
+  .feature h3 { font-size: 17px; margin-bottom: 6px; }
+  .feature p { color: var(--ink-2); font-size: 15px; }
+
+  /* analysis showcase */
+  .showcase { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 40px; align-items: center; }
+  .ticks { list-style: none; padding: 0; margin: 22px 0 0; display: grid; gap: 12px; }
+  .ticks li { display: flex; gap: 12px; align-items: flex-start; color: var(--ink-2); }
+  .ticks li::before { content: ""; width: 20px; height: 20px; border-radius: 50%; flex: none; margin-top: 2px; background: #e8f6ea url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 8.5l2.5 2.5L12 5.5' fill='none' stroke='%23157f1f' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/14px no-repeat; }
+  .ticks b { color: var(--ink); }
+  .shots { position: relative; }
+  .shots .frame + .frame { margin-top: -40px; margin-left: 12%; width: 88%; position: relative; }
+  .caption { font-size: 13px; color: var(--muted); margin-top: 10px; text-align: right; }
+
+  /* steps */
+  .steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; counter-reset: step; }
+  .step { padding: 22px; position: relative; }
+  .step::before { counter-increment: step; content: counter(step); width: 34px; height: 34px; border-radius: 50%; background: var(--blue); color: #fff; font-weight: 800; display: grid; place-items: center; margin-bottom: 14px; }
+  .step h3 { font-size: 16.5px; margin-bottom: 6px; }
+  .step p { color: var(--ink-2); font-size: 14.5px; }
+
+  /* faq */
+  .faq { display: grid; gap: 12px; max-width: 860px; }
+  details { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 4px 20px; }
+  summary { cursor: pointer; font-weight: 700; padding: 14px 0; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; font-size: 22px; line-height: 1; color: var(--blue); font-weight: 400; }
+  details[open] summary::after { content: "–"; }
+  details p { color: var(--ink-2); padding: 0 0 16px; }
+
+  /* cta band + footer */
+  .band { background: linear-gradient(135deg, #164a8a, var(--navy)); color: #fff; border-radius: 20px; padding: 44px; display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .band h2 { font-size: clamp(24px, 3vw, 32px); }
+  .band p { color: #c9daf1; margin-top: 8px; }
+  footer { padding: 34px 0 44px; color: var(--muted); font-size: 14px; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 26px; }
+
+  .btn-outline { background: #fff; color: var(--blue); border-color: var(--line); }
+  .btn-outline:hover { border-color: var(--blue-100); background: var(--blue-50); }
+  .btn[aria-disabled="true"] { opacity: .55; pointer-events: none; box-shadow: none; }
+  .paper .desc { color: var(--ink-2); margin-top: 6px; }
+  .paper .acts { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .paper .last { font-size: 14px; color: var(--ink-2); }
+  .tag.amber { background: #fff4dc; color: #8a5a00; }
+  .skeleton { min-height: 220px; display: grid; place-items: center; color: var(--muted); }
+  .papers.many { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .note-card { padding: 22px 24px; color: var(--ink-2); }
+  .mine td .sub { display: block; font-size: 13px; color: var(--muted); }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+  .pill.ok { background: #e8f6ea; color: #157f1f; }
+  .pill.run { background: #fff4dc; color: #8a5a00; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .mine-foot { padding: 14px 18px; font-size: 13.5px; color: var(--muted); border-top: 1px solid var(--line); }
+  .foot-links a { color: var(--muted); text-decoration: underline; }
+
+  @media (max-width: 960px) {
+    .hero .wrap, .showcase, .papers, .papers.many { grid-template-columns: 1fr; }
+    .features { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .nav-links { display: none; }
+    .nav .btn { margin-left: auto; }
+  }
+  @media (max-width: 600px) {
+    .wrap { padding: 0 16px; }
+    section { padding: 56px 0; }
+    .hero .wrap { padding-top: 40px; padding-bottom: 48px; gap: 32px; }
+    .features, .steps { grid-template-columns: 1fr; }
+    .band { padding: 28px 22px; }
+    .hero-stats { gap: 20px; }
+    .shots .frame + .frame { margin-left: 0; margin-top: 16px; width: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .btn:hover { transform: none; } .dot.wait { animation: none; } }
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Main">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="CEED Mock Test home">
+      <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="7" fill="#1e63b5"/><path d="M9 11h14M9 16h9M9 21h11" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="23" cy="21" r="2.6" fill="#ffd34d"/></svg>
+      CEED Mock Test
+    </a>
+    <div class="nav-links">
+      <a href="#papers">Papers</a>
+      <a href="#pattern">Exam pattern</a>
+      <a href="#features">Features</a>
+      <a href="#faq">FAQ</a>
+      <a href="#my">My results</a>
+    </div>
+    <a class="btn btn-primary btn-sm" data-start href="#papers">Start test</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">Free · CEED Part A practice</span>
+      <h1>Practise CEED previous-year papers in the <span>real exam interface</span>.</h1>
+      <p class="lede">Same sections, timer and question palette as the computer-based test. Every question is the original paper, and you get a detailed analysis after each attempt.</p>
+      <div class="cta-row">
+        <a class="btn btn-light" data-start href="#papers">Start the mock test →</a>
+        <a class="btn btn-ghost" href="#pattern">See exam pattern</a>
+      </div>
+      <div class="status" role="status" aria-live="polite"><span class="dot wait" id="dot"></span><span id="status-text">Connecting to the test server…</span></div>
+      <div class="hero-stats">
+        <div><b>45</b><span>questions</span></div>
+        <div><b>3</b><span>sections</span></div>
+        <div><b>60</b><span>minutes</span></div>
+        <div><b>100</b><span>marks</span></div>
+      </div>
+    </div>
+    <div class="frame" aria-hidden="false">
+      <div class="frame-bar"><i></i><i></i><i></i><span>CEED 2017 — Part A · Exam</span></div>
+      <img src="assets/img/shot-exam.webp" width="1200" height="750" alt="The exam screen: section tabs, timer, a question with the NAT keypad, and the question palette">
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="papers">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker">Available papers</div>
+        <h2>Original CEED papers, question by question</h2>
+        <p>Every question is shown exactly as it appeared in the official paper. Answers are checked automatically with CEED's marking scheme.</p>
+      </div>
+      <div class="papers" id="paper-list">
+        <div class="card skeleton" role="status">Loading the papers…</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="my" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head" style="margin-bottom:22px">
+        <div class="kicker">My results</div>
+        <h2>Your attempts on this device</h2>
+        <p>Open the analysis of any attempt, or resume a test you didn't finish.</p>
+      </div>
+      <div id="my-list"><div class="card note-card">Looking for your attempts…</div></div>
+    </div>
+  </section>
+
+  <section id="pattern" style="background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker">Exam pattern · CEED 2017 Part A</div>
+        <h2>Three sections, one 60-minute timer</h2>
+        <p>Move freely between sections. Answers marked for review still count if you have answered them.</p>
+      </div>
+      <div class="card table-card"><div class="table-scroll">
+        <table>
+          <thead><tr><th>Section</th><th>Question type</th><th>Questions</th><th>Correct</th><th>Wrong</th><th>Total</th></tr></thead>
+          <tbody>
+            <tr><td><span class="sw" style="background:#2a78d6"></span><b>Section I</b></td><td>NAT · type the number on a keypad</td><td>10</td><td class="pos">+3</td><td>0</td><td>30</td></tr>
+            <tr><td><span class="sw" style="background:#eb6834"></span><b>Section II</b></td><td>MSQ · one or more options correct</td><td>10</td><td class="pos">+2 <span style="color:var(--muted);font-weight:500">(all correct)</span></td><td>0</td><td>20</td></tr>
+            <tr><td><span class="sw" style="background:#1baf7a"></span><b>Section III</b></td><td>MCQ · only one option correct</td><td>25</td><td class="pos">+2</td><td class="neg">−0.6</td><td>50</td></tr>
+            <tr class="total"><td>Total</td><td></td><td>45</td><td></td><td></td><td>100</td></tr>
+          </tbody>
+        </table>
+      </div></div>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker">Built like the real CBT</div>
+        <h2>Practise the paper and the interface</h2>
+        <p>On exam day the interface shouldn't surprise you. This one works the same way.</p>
+      </div>
+      <div class="features">
+        <div class="card feature"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><h3>Real exam screen</h3><p>Section tabs, countdown timer, question palette with all five status colours, Mark for Review and Save &amp; Next.</p></div>
+        <div class="card feature"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M16 11h0M8 15h2M12 15h2M8 19h0"/></svg></div><h3>NAT virtual keypad</h3><p>Numerical answers are typed on the on-screen keypad, exactly like the exam.</p></div>
+        <div class="card feature"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></div><h3>No sign-up needed</h3><p>Just enter your name and email. No password or OTP. Your attempts and results are saved on the server.</p></div>
+        <div class="card feature"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><h3>Autosave &amp; resume</h3><p>Every answer is saved as you go. If your internet or power goes off, open the test again and resume where you stopped.</p></div>
+        <div class="card feature"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h3>Time on every question</h3><p>See how long each question took you, compared with other students' average time.</p></div>
+        <div class="card feature"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div><h3>Section &amp; topic analysis</h3><p>Score, accuracy and time per section, topic-wise accuracy, rank among students and a review of every question.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+    <div class="wrap showcase">
+      <div>
+        <div class="kicker">After you submit</div>
+        <h2 style="font-size:clamp(26px,3.2vw,36px);margin:8px 0 12px">An analysis that shows how you used your 60 minutes</h2>
+        <p style="color:var(--ink-2);font-size:17px">Not just a score. See which question you were on at what time, where you lost marks and what to revise first.</p>
+        <ul class="ticks">
+          <li><span><b>Correct, wrong and unattempted</b> questions, accuracy and marks lost to negative marking</span></li>
+          <li><span><b>Section-wise</b> score, accuracy and how you split your time</span></li>
+          <li><span><b>Exam timeline:</b> which question was on screen at what time, and when each answer was saved</span></li>
+          <li><span><b>Rank and percentile</b> among everyone who attempted the paper</span></li>
+          <li><span><b>Question review</b> with the correct answer, your answer and time spent</span></li>
+        </ul>
+      </div>
+      <div class="shots">
+        <div class="frame"><div class="frame-bar"><i></i><i></i><i></i><span>Analysis</span></div><img src="assets/img/shot-result.webp" width="1000" height="838" alt="Sample analysis: score 58.6 out of 100, rank, correct, wrong and unattempted counts, and key insights"></div>
+        <div class="frame"><img src="assets/img/shot-chart.webp" width="1000" height="355" alt="Sample chart of time spent on each of the 45 questions, coloured by correct, wrong or unattempted"></div>
+        <p class="caption">Sample analysis from a practice attempt</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="wrap">
+      <div class="sec-head">
+        <div class="kicker">How it works</div>
+        <h2>Ready in under a minute</h2>
+      </div>
+      <div class="steps">
+        <div class="card step"><h3>Enter your name &amp; email</h3><p>No password or OTP. Use the same email every time so your attempts stay together.</p></div>
+        <div class="card step"><h3>Read the instructions</h3><p>The same two instruction pages and declaration as the real exam.</p></div>
+        <div class="card step"><h3>Attempt in 60 minutes</h3><p>Answer, mark for review and move between sections. The test submits itself when time runs out.</p></div>
+        <div class="card step"><h3>Study your analysis</h3><p>Review every question, your timeline and your rank, then reattempt when you're ready.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq" style="padding-top:20px">
+    <div class="wrap">
+      <div class="sec-head"><div class="kicker">FAQ</div><h2>Questions students ask</h2></div>
+      <div class="faq">
+        <details><summary>Is it free?</summary><p>Yes. Enter your name and email and attempt any available paper. There is no sign-up or password.</p></details>
+        <details><summary>Do I need to install anything?</summary><p>No. It runs in your browser. A laptop or desktop gives the closest experience to the exam hall, but it also works on phones.</p></details>
+        <details><summary>What if my internet or power goes off during the test?</summary><p>Your answers are saved to the server as you go. Open this site again on the same device and click Resume, or start the same paper with the same email on another device. The test continues where you stopped, and the timer pauses while you are away.</p></details>
+        <details><summary>Can I attempt a paper again?</summary><p>Yes. Each attempt gets its own analysis. Your rank always compares first attempts, so it stays fair.</p></details>
+        <details><summary>Where can I see my results later?</summary><p>Under <b>My results</b> on this page, on the device you used for the test. On a result page, click <b>Copy result link</b> and keep the link to open your analysis on any device.</p></details>
+        <details><summary>Does clicking a question number save my answer?</summary><p>No, just like the real exam. Use <b>Save &amp; Next</b> or <b>Mark for Review &amp; Next</b> to save an answer.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding-top:20px">
+    <div class="wrap">
+      <div class="band">
+        <div><h2>Take the CEED 2017 mock now</h2><p>45 questions · 60 minutes · instant analysis</p></div>
+        <a class="btn btn-light" data-start href="#papers">Start the mock test →</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="foot-links">© <span id="year">2026</span> CEED Mock Test · <a href="admin.html">Admin</a></span>
+    <span>Independent practice platform, not affiliated with IIT Bombay or the official CEED exam. Questions © IIT Bombay, used for practice.</span>
+  </div>
+</footer>
+
+<script type="module" src="assets/home.js"></script>
+</body>
+</html>
