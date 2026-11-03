@@ -557,14 +557,22 @@ function questionEditor(ctx) {
       } }, t));
     }
   };
+  const altsText = (() => {
+    const a = (q0.answer && Array.isArray(q0.answer.alts)) ? q0.answer.alts : [];
+    if (q0.qtype === 'NAT') return a.map((r) => (Number(r.min) === Number(r.max) ? String(r.min) : `${r.min} to ${r.max}`)).join(' or ');
+    return a.filter(Array.isArray).map((g) => g.join(',')).join(' or ');
+  })();
+  const altInput = el('input', { class: 'input', type: 'text', value: altsText });
+  const altField = field('Also accept (optional, for official keys like “7 OR 9”)', altInput);
   const natMin = el('input', { class: 'input', type: 'text', inputmode: 'decimal', placeholder: 'e.g. 56', value: st.natMin });
   const natMax = el('input', { class: 'input', type: 'text', inputmode: 'decimal', placeholder: 'optional', value: st.natMax });
   const drawAnswer = () => {
     answerBox.innerHTML = '';
     partial.classList.toggle('hidden', st.qtype !== 'MSQ');
+    altInput.placeholder = st.qtype === 'NAT' ? 'e.g. 9   or   9 or 12   or   24 to 25.5' : 'e.g. B   or   B,D or A,C';
     if (st.qtype === 'NAT') {
       answerBox.append(el('div', { class: 'row2' }, field('Correct answer', natMin), field('…up to (for a range)', natMax)),
-        el('p', { class: 'inline-note' }, 'For an exact answer fill only the first box. For a range (e.g. 250.9 to 251.1) fill both.'));
+        el('p', { class: 'inline-note' }, 'For an exact answer fill only the first box. For a range (e.g. 250.9 to 251.1) fill both.'), altField);
       return;
     }
     const chips = el('div', { class: 'opt-chips', role: 'group', 'aria-label': 'Correct options' });
@@ -577,7 +585,8 @@ function questionEditor(ctx) {
       } }, L));
     }
     answerBox.append(el('div', { class: 'field' }, el('label', {}, st.qtype === 'MCQ' ? 'Correct option' : 'Correct options (select all that are correct)'), el('div', { class: 'row' }, chips, optCount)),
-      el('p', { class: 'inline-note' }, st.qtype === 'MCQ' ? 'Tip: hold Shift to select a second option only if the official key accepts two answers.' : 'Students get marks only if they select exactly these options (unless partial marking is on).'));
+      el('p', { class: 'inline-note' }, st.qtype === 'MCQ' ? 'Tip: hold Shift to select a second option only if the official key accepts two answers.' : 'Students get full marks only if they select exactly these options. With partial marking on, each correct option chosen (and no wrong one) earns a share of the marks.'),
+      st.qtype === 'MSQ' ? altField : null);
   };
   drawType();
   drawAnswer();
@@ -601,7 +610,9 @@ function questionEditor(ctx) {
       qtype: st.qtype, options_count: st.options, marks: marks.value, neg_marks: neg.value,
       partial: partial.querySelector('input').checked, bonus: bonus.querySelector('input').checked,
       topic: topic.value, solution: solution.value, text: text.value,
-      answer: st.qtype === 'NAT' ? { min: natMin.value.trim(), max: natMax.value.trim() } : { options: [...st.keys] },
+      answer: st.qtype === 'NAT'
+        ? { min: natMin.value.trim(), max: natMax.value.trim(), alts: parseAlts('NAT', altInput.value) }
+        : { options: [...st.keys], alts: st.qtype === 'MSQ' ? parseAlts('MSQ', altInput.value) : [] },
     };
     if (editing) { data.id = q0.id; data.section_id = sectionSel.value; } else data.section_id = ctx.section.id;
     if (!editing && !st.file && !text.value.trim()) { err.textContent = 'Add a screenshot of the question first.'; return false; }
@@ -629,6 +640,19 @@ function questionEditor(ctx) {
   if (!editing) actions.push({ label: 'Save & add next', onClick: () => save(true) });
   actions.push({ label: editing ? 'Save changes' : 'Save question', kind: 'primary', onClick: () => save(false) });
   const m = modal({ title: title(), wide: true, body, actions, onClose: () => document.removeEventListener('paste', onPaste) });
+}
+
+// "Also accept" text -> list of extra accepted answers. NAT: "9 or 12" / "24 to 25.5". MSQ: "B or B,D".
+function parseAlts(qtype, text) {
+  const t = String(text || '').trim();
+  if (!t) return [];
+  if (qtype === 'NAT') {
+    return t.split(/\s*(?:\bor\b|;|\||,)\s*/i).filter(Boolean).map((p) => {
+      const m = p.match(/^(-?\d*\.?\d+)\s*(?:to|–|-)\s*(-?\d*\.?\d+)$/i);
+      return m ? { min: m[1], max: m[2] } : { min: p, max: p };
+    });
+  }
+  return t.split(/\s*(?:\bor\b|;|\|)\s*/i).map((p) => [...new Set(p.toUpperCase().match(/[A-H]/g) || [])].sort()).filter((g) => g.length);
 }
 
 // Screenshots are re-encoded (max 1600 px wide, WebP) so they load fast for students.
@@ -695,14 +719,16 @@ async function showAttempts(params) {
   const paperSel = el('select', { class: 'input' }, el('option', { value: '' }, 'All papers'), ...papers.map((p) => el('option', { value: p.id }, p.title)));
   const statusSel = el('select', { class: 'input' }, el('option', { value: '' }, 'All statuses'), el('option', { value: 'submitted' }, 'Submitted'), el('option', { value: 'in_progress' }, 'In progress'));
   const modeSel = el('select', { class: 'input', 'aria-label': 'Rank by' }, el('option', { value: 'first' }, 'Rank by first attempt'), el('option', { value: 'best' }, 'Rank by best attempt'));
-  paperSel.value = params.get('paper') || (papers.length === 1 ? papers[0].id : '');
+  const pp = params.get('paper');
+  const defaultPaper = papers.find((p) => p.attempt_count > 0) || papers[0];
+  paperSel.value = pp === 'all' ? '' : (pp || (defaultPaper ? defaultPaper.id : ''));
   statusSel.value = params.get('status') || '';
   modeSel.value = params.get('rank') === 'best' ? 'best' : 'first';
   const student = params.get('student') || '';
   const box = el('div');
   const setHash = () => {
     const q = new URLSearchParams();
-    if (paperSel.value) q.set('paper', paperSel.value);
+    q.set('paper', paperSel.value || 'all');
     if (statusSel.value) q.set('status', statusSel.value);
     if (modeSel.value === 'best') q.set('rank', 'best');
     if (student) q.set('student', student);

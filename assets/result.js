@@ -63,14 +63,16 @@ function qRanges(nums) {
 function clientEval(q, ans) {
   const key = q.correct_answer;
   if (!key || ans === null || ans === undefined || ans === '') return null;
+  const alts = Array.isArray(key.alts) ? key.alts : []; // other accepted answers ("7 OR 9", "B or B, D")
   if (q.qtype === 'NAT') {
     const v = parseFloat(ans);
-    return Number.isFinite(v) && v >= Number(key.min) - 1e-9 && v <= Number(key.max ?? key.min) + 1e-9;
+    return Number.isFinite(v) && [key, ...alts].some((k) => k && k.min !== undefined && k.min !== null
+      && v >= Number(k.min) - 1e-9 && v <= Number(k.max ?? k.min) + 1e-9);
   }
-  const set = new Set(key.options || []);
-  if (q.qtype === 'MCQ') return set.has(ans);
+  const sets = [key.options || [], ...alts].filter((g) => Array.isArray(g) && g.length);
+  if (q.qtype === 'MCQ') return sets.some((g) => g.includes(ans));
   const sel = Array.isArray(ans) ? ans : [ans];
-  return sel.length === set.size && sel.every((x) => set.has(x));
+  return sets.some((g) => sel.length === g.length && sel.every((x) => g.includes(x)));
 }
 
 function resultBadge(outcome) {

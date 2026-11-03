@@ -219,10 +219,15 @@ language sql immutable set search_path = '' as $$
   select case
     when p_answer is null or jsonb_typeof(p_answer) <> 'object' then ''
     when p_qtype = 'NAT' then
-      case when p_answer->>'min' is null then ''
-           when (p_answer->>'max') is null or (p_answer->>'min')::numeric = (p_answer->>'max')::numeric then p_answer->>'min'
-           else (p_answer->>'min') || ' to ' || (p_answer->>'max') end
-    else coalesce((select string_agg(x, ', ' order by x) from jsonb_array_elements_text(coalesce(p_answer->'options', '[]'::jsonb)) x), '')
+      coalesce((select string_agg(case when (k->>'max') is null or (k->>'min')::numeric = (k->>'max')::numeric then k->>'min'
+                                       else (k->>'min') || ' to ' || (k->>'max') end, ' or ' order by o)
+                  from jsonb_array_elements(jsonb_build_array(p_answer) || coalesce(p_answer->'alts', '[]'::jsonb)) with ordinality as e(k, o)
+                 where jsonb_typeof(k) = 'object' and k->>'min' is not null), '')
+    else coalesce((select string_agg(t, ' or ' order by o)
+                     from (select o, (select string_agg(x, case when p_qtype = 'MCQ' then ' or ' else ', ' end order by x)
+                                        from jsonb_array_elements_text(k) x) as t
+                             from jsonb_array_elements(jsonb_build_array(coalesce(p_answer->'options', '[]'::jsonb)) || coalesce(p_answer->'alts', '[]'::jsonb)) with ordinality as e(k, o)
+                            where jsonb_typeof(k) = 'array' and jsonb_array_length(k) > 0) s), '')
   end
 $$;
 
@@ -266,11 +271,14 @@ end $$;
 
 create or replace function app.evaluate(p_q app.questions, p_status text, p_answer jsonb) returns app.eval_result
 language plpgsql immutable set search_path = '' as $$
+-- Marks one answer. The key may list other accepted answers in "alts" (official keys like "7 OR 9" or "B or B, D").
+-- MSQ partial marking (CEED 2024+): when no wrong option is chosen, each correct option chosen earns marks / options_count.
 declare
-  ans jsonb;
-  v numeric; lo numeric; hi numeric;
+  ans jsonb; k jsonb;
+  v numeric; n int;
   keyset text[]; sel text[];
   neg double precision := case when coalesce(p_q.neg_marks, 0) = 0 then 0 else -p_q.neg_marks end;
+  best app.eval_result;
 begin
   if p_q.bonus then return row('bonus', p_q.marks)::app.eval_result; end if;
   ans := case when p_status in ('answered', 'answered_marked') then p_answer else null end;
@@ -283,24 +291,36 @@ begin
     exception when others then
       return row('wrong', neg)::app.eval_result;
     end;
-    lo := (p_q.answer->>'min')::numeric;
-    hi := coalesce((p_q.answer->>'max')::numeric, lo);
-    if lo is not null and v >= lo - 0.000000001 and v <= hi + 0.000000001 then
+    for k in select value from jsonb_array_elements(jsonb_build_array(p_q.answer) || coalesce(p_q.answer->'alts', '[]'::jsonb)) loop
+      if jsonb_typeof(k) = 'object' and (k->>'min') is not null
+         and v >= (k->>'min')::numeric - 0.000000001
+         and v <= coalesce((k->>'max')::numeric, (k->>'min')::numeric) + 0.000000001 then
+        return row('correct', p_q.marks)::app.eval_result;
+      end if;
+    end loop;
+    return row('wrong', neg)::app.eval_result;
+  end if;
+  if p_q.qtype = 'MCQ' then
+    if exists (select 1 from jsonb_array_elements(jsonb_build_array(coalesce(p_q.answer->'options', '[]'::jsonb)) || coalesce(p_q.answer->'alts', '[]'::jsonb)) a
+                where jsonb_typeof(a) = 'array' and a ? (ans #>> '{}')) then
       return row('correct', p_q.marks)::app.eval_result;
     end if;
     return row('wrong', neg)::app.eval_result;
   end if;
-  keyset := array(select jsonb_array_elements_text(coalesce(p_q.answer->'options', '[]'::jsonb)));
-  if p_q.qtype = 'MCQ' then
-    if (ans #>> '{}') = any(keyset) then return row('correct', p_q.marks)::app.eval_result; end if;
-    return row('wrong', neg)::app.eval_result;
-  end if;
   sel := case when jsonb_typeof(ans) = 'array' then array(select jsonb_array_elements_text(ans)) else array[ans #>> '{}'] end;
-  if sel <@ keyset and keyset <@ sel then return row('correct', p_q.marks)::app.eval_result; end if;
-  if p_q.partial and sel <@ keyset and coalesce(array_length(sel, 1), 0) > 0 then
-    return row('partial', round((p_q.marks * array_length(sel, 1) / greatest(1, array_length(keyset, 1)))::numeric, 2)::double precision)::app.eval_result;
-  end if;
-  return row('wrong', neg)::app.eval_result;
+  n := coalesce(array_length(sel, 1), 0);
+  best := row('wrong', neg)::app.eval_result;
+  for k in select value from jsonb_array_elements(jsonb_build_array(coalesce(p_q.answer->'options', '[]'::jsonb)) || coalesce(p_q.answer->'alts', '[]'::jsonb)) loop
+    if jsonb_typeof(k) <> 'array' or jsonb_array_length(k) = 0 then continue; end if;
+    keyset := array(select jsonb_array_elements_text(k));
+    if sel <@ keyset and keyset <@ sel then return row('correct', p_q.marks)::app.eval_result; end if;
+    if p_q.partial and n > 0 and sel <@ keyset then
+      if best.outcome = 'wrong' or best.marks < p_q.marks * n / greatest(1, coalesce(nullif(p_q.options_count, 0), 4)) then
+        best := row('partial', round((p_q.marks * n / greatest(1, coalesce(nullif(p_q.options_count, 0), 4)))::numeric, 2)::double precision)::app.eval_result;
+      end if;
+    end if;
+  end loop;
+  return best;
 end $$;
 
 create or replace function app.time_used(p_a app.attempts, p_mode text, p_resume boolean) returns bigint
@@ -966,7 +986,7 @@ language plpgsql volatile security definer set search_path = '' as $$
 declare
   cur app.questions; sec app.sections; qid uuid; qt text; opts int; v_bonus boolean; ans jsonb; letters text;
   mn numeric; mx numeric; keys text[]; mk double precision; ng double precision; img uuid; pos int; img_data text;
-  has_attempts boolean;
+  has_attempts boolean; k jsonb; alts jsonb; amn numeric; amx numeric; akeys text[];
 begin
   perform app.check_admin(p_pass);
   if p_data->>'id' is not null then
@@ -995,12 +1015,35 @@ begin
     end;
     if mn is null and not v_bonus then perform app.fail('Enter the correct numerical answer (or a range).'); end if;
     if mn is not null and mx < mn then perform app.fail('The "to" value of the range must be greater than or equal to the "from" value.'); end if;
-    ans := case when mn is null then null else jsonb_build_object('min', mn, 'max', mx) end;
+    -- other accepted answers, e.g. an official key "7 OR 9"
+    alts := '[]'::jsonb;
+    for k in select value from jsonb_array_elements(case when jsonb_typeof(ans->'alts') = 'array' then ans->'alts' else '[]'::jsonb end) limit 10 loop
+      begin
+        amn := nullif(btrim(coalesce(k->>'min', '')), '')::numeric;
+        amx := coalesce(nullif(btrim(coalesce(k->>'max', '')), '')::numeric, amn);
+      exception when others then
+        perform app.fail('Each "also accept" answer must be a number or a range like 24 to 25.5.');
+      end;
+      if amn is not null then
+        if amx < amn then perform app.fail('In "also accept", write a range from the smaller number to the bigger one.'); end if;
+        alts := alts || jsonb_build_array(jsonb_build_object('min', amn, 'max', amx));
+      end if;
+    end loop;
+    ans := case when mn is null then null else jsonb_build_object('min', mn, 'max', mx)
+             || case when jsonb_array_length(alts) > 0 then jsonb_build_object('alts', alts) else '{}'::jsonb end end;
   else
     keys := array(select distinct upper(x) from jsonb_array_elements_text(coalesce(ans->'options', '[]'::jsonb)) x
                    where length(x) = 1 and position(upper(x) in letters) > 0 order by 1);
     if coalesce(array_length(keys, 1), 0) = 0 and not v_bonus then perform app.fail('Select the correct option(s).'); end if;
-    ans := case when coalesce(array_length(keys, 1), 0) = 0 then null else jsonb_build_object('options', to_jsonb(keys)) end;
+    -- other accepted option sets, e.g. an official key "B or B, D"
+    alts := '[]'::jsonb;
+    for k in select value from jsonb_array_elements(case when jsonb_typeof(ans->'alts') = 'array' then ans->'alts' else '[]'::jsonb end) limit 10 loop
+      if jsonb_typeof(k) <> 'array' then continue; end if;
+      akeys := array(select distinct upper(x) from jsonb_array_elements_text(k) x where length(x) = 1 and position(upper(x) in letters) > 0 order by 1);
+      if coalesce(array_length(akeys, 1), 0) > 0 and akeys is distinct from keys then alts := alts || jsonb_build_array(to_jsonb(akeys)); end if;
+    end loop;
+    ans := case when coalesce(array_length(keys, 1), 0) = 0 then null else jsonb_build_object('options', to_jsonb(keys))
+             || case when jsonb_array_length(alts) > 0 then jsonb_build_object('alts', alts) else '{}'::jsonb end end;
   end if;
   mk := coalesce((p_data->>'marks')::double precision, cur.marks, 1);
   ng := coalesce((p_data->>'neg_marks')::double precision, cur.neg_marks, 0);
