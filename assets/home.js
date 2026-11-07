@@ -9,7 +9,7 @@ $('#year').textContent = new Date().getFullYear();
 const EXAM_FOR = { CEED: 'for M.Des', UCEED: 'for B.Des' };
 const EXAM_NOTE = {
   CEED: 'CEED Part A: 60 minutes · Section I NAT, Section II MSQ, Section III MCQ.',
-  UCEED: 'UCEED Part A: 2 hours (2 hours 30 minutes in 2023) · Section 1 NAT, Section 2 MSQ, Section 3 MCQ.',
+  UCEED: 'UCEED Part A: 2 hours (2 hours 30 minutes in 2020 to 2023). 2015 to 2019 papers are the full 3-hour computer-based exam. Every paper has NAT, MSQ and MCQ sections.',
 };
 const TAB_KEY = 'ceed_exam_tab';
 let PAPERS = null;
